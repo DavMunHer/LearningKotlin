@@ -423,4 +423,321 @@ Make `User` immutable from the outside (all `val` properties), but allow `age` t
 
 **Tips:**
 
-- For `area` in `Rectangle`, you can use `override`
+- For `area` in `Rectangle`, you can use `override`val area get() = base * height (computed property).
+
+- Secondary constructor uses `:this(...)` to call the parent and `:super(...)` if `Shape` requires arguments.
+
+**Acceptance criteria/tests:**
+
+- Creating a `Rectangle(3.0, 4.0)` produces `area == 12.0`.
+
+- Creating a `Circle` by radius and diameter produces identical areas.
+
+- Attempting to create shapes with dimensions <= 0 throws an exception.
+
+**Optional challenge:**
+Mark `Rectangle` as `open` and create a `Square` subclass that reuses the rectangle logic.
+
+---
+
+# Activity 3 — Results with `sealed` (sealed classes/interfaces) and exhaustive `when`
+
+**Objective:** Practice `sealed` (classes or interfaces), and use of `when` without `else`, and state representation.
+
+**What to create:**
+
+1. `sealed` class Result<out T>` with subclasses:
+
+- `Success<T>(value: T)`
+
+- `Error(message: String, code: Int = 0)`
+
+- `Loading` (singleton object)
+
+2. A set of functions that return `Result<T>` (simulates a call that may be loading, fail, or return data).
+
+3. Use `when` to handle all three cases without `else` (ensure exhaustive compilation).
+
+**Step-by-step:**
+
+- Define the `sealed` hierarchy.
+
+- Implement a function that simulates an operation (e.g., searching for a `User`) and returns `Success`, `Error`, or `Loading`.
+
+- Consume the function and handle the result with an exhaustive `when` statement.
+
+**Hints:**
+
+- `Loading` can be an `object` (singleton).
+
+- `when` in Kotlin is exhaustive with `sealed`, so you won't need an `else` statement if you cover all subclasses.
+
+**Suggested Tests:**
+
+- Mock each return and check that the corresponding `when` branch executes.
+
+- Make sure that `when` doesn't require an `else` statement.
+
+**Optional Challenge:**
+Add a `SuccessWithGoal<T>(value: T, goal: Map<String, Any>)` type and update `when` to handle it.
+
+---
+
+# Activity 4 — Interfaces with Default Implementations and Conflicts (Multiple Interfaces)
+
+**Objective:** Practice using default methods in interfaces and resolving conflicts using `super<Interface>.method()`.
+
+**What to create:**
+
+1. Two interfaces `A` and `B` with a `greeting()` method that have different default implementations.
+
+2. Class `C` that implements both and chooses to call both implementations from its overridden `greeting()`.
+
+3. Also add at least one abstract method in an interface that class `C` must implement.
+
+**Step-by-Step:**
+
+- Declare both interfaces with `fun greeting() { ... }`.
+
+- Implement `C : A, B` and call `super<A>.greeting()` and `super<B>.greeting()` within the `override`. **Hints:**
+
+- The `super<Interface>.method()` call is the way to specify the desired implementation.
+
+**Suggested Tests:**
+
+- Call `C().greet()` and verify (using output or spy) that both implementations were executed.
+
+**Optional Challenge:**
+Make one of the interfaces a `sealed interface` and define concrete types that implement it.
+
+---
+
+# Activity 5 — Delegation (`by`) and Logger Pattern with Injection (Composition over Inheritance)
+
+**Objective:** Practice interface delegation, dependency injection, and use of `by`.
+
+**What to create:**
+
+1. `Logger { fun log(level: Level, msg: String) }` interface with an `enum class Level`.
+
+2. Concrete implementations: `ConsoleLogger`, `FileLogger` (can simulate typing), and `NoOpLogger`.
+
+3. A `Service` class that accepts a `Logger` in its constructor **and** delegates to `Logger` using `by logger`.
+
+4. Alternatively, create a `ServiceWithLogs` class that *exposes* specific methods and internally uses delegation for logging functions.
+
+**Step-by-Step:**
+
+- Design the `Logger` interface.
+
+- Implement at least two loggers with distinct behaviors.
+
+- Create `Service(private val logger: Logger) : Logger by logger` and demonstrate that `Service` has the delegated `Logger` methods.
+
+- Change the logger at runtime (if your design allows it) or create a factory for `Service` that injects the desired logger.
+
+**Tips:**
+
+- Delegation prevents you from writing `override fun log(...) = logger.log(...)` manually.
+
+- For testing, inject `NoOpLogger` or a `Logger` that collects messages in memory.
+
+**Suggested tests:**
+
+- Instantiate `Service` with `ConsoleLogger`, observe the output.
+
+- Replacing it with `NoOpLogger` should produce no output.
+
+- Add tests that verify that the `Service` received logging calls (use a test implementation that accumulates messages).
+
+**Optional challenge:**
+Implement a `Logger` that filters by the minimum configured level (e.g., only `WARN` and `ERROR`).
+
+---
+
+# Activity 6 — `object` (singleton), `companion object`, anonymous object expressions
+
+**Objective:** Practice `object` (singleton), `companion object` with factory methods and `object : Inter` expressionsface`.
+
+**What to create:**
+
+1. A singleton `Config` object containing a global configuration (e.g., `DebugMode: Boolean` and a `load()` function).
+
+2. In the `User` data class (in Activity 1), use a `companion object` with a function that uses `Config` to decide how to generate the `id` (e.g., a `DEV-` prefix if `DebugMode == true`).
+
+3. In one place, create an anonymous `object: Runnable { override fun run() = ... }` instance and use it to simulate a callback or listener.
+
+**Step-by-Step:**
+
+- Create `Config` as an `object`.
+
+- Modify the `companion object` to read `Config` when generating data.
+
+- Use an `object expression` to test an ad-hoc interface (e.g., `Comparator` or `Runnable`).
+
+**Tips:**
+
+- `object` is a singleton instance; you don't need `()` to access it.
+
+- `companion object` can be named if you want a `companion object Factory`.
+
+**Suggested Tests:**
+
+- Change `Config.DebugMode` before creating a `User` to check if the generated `id` changes depending on the mode.
+
+- Pass the `object expression` to a function that expects a `Runnable` and ensure it executes the code.
+
+**Optional Challenge:**
+Use `object` to implement a simple, globally accessible cache (in-memory map).
+
+---
+
+# Activity 7 — Advanced Properties and Extensions
+
+**Objective:** Practice accessing the `field` in getter/setter, changing getter/setter visibility, abstract properties, and extension properties.
+
+**What to create:**
+
+1. `Account` class with `balance: Double` that:
+
+- Has a `private set` on `balance`.
+
+- `deposit` and `withdraw` methods that directly use `field` within a `setter` or securely update the balance.
+
+2. Implement a custom `getter` that returns the formatted `balance` (e.g., with two decimal places or currency).
+
+3. Create an extension property for `String`, e.g., `isEmailValid: Boolean` (`get` only), and use it in `User`.
+
+4. Define an abstract property `description: String` in an interface and have `Account` implement it.
+
+**Step-by-Step:**
+
+- Declare the `balance` property with a `private set`.
+
+- Implement logic to prevent negative balances.
+
+- Define and use the extension property to validate emails.
+
+**Tips:**
+
+- To use `field`, you need a custom `getter` or `setter` on that same property.
+
+- Extension properties cannot add storage (there is no `field`); their `getter` must calculate the value.
+
+**Suggested Tests:**
+
+- Deposit and withdraw with boundary conditions (withdrawing more than the balance).
+
+- Validate that `isEmailValid` is `true` for valid basic emails.
+
+**Optional Challenge:**
+Implement a `delegated` property (e.g., `by lazy` or `Delegates.observable`) to store the last transaction date in `Account`.
+
+---
+
+# Activity 8 — Mini Integration Project (Uses Multiple Concepts)
+
+**Objective:** Integrate interfaces, delegation, data classes, sealing, singletons, companions, inheritance, properties, and visibility into a small modular app.
+
+**Project Description:**
+Create a **mini-registration and session system** (CLI or small set of tests) that allows:
+
+- Register users (`User` data class).
+
+- Authenticate users (mock) by returning `Result` (`sealed`).
+
+- Log actions in an injected `Logger` (uses `by` delegation).
+
+- Maintain global configuration in `object Config`.
+
+- Use `companion` for factories and `object expression` for quick handlers.
+
+- A simple user repository that you can mock (injection with delegation), for example, `RepoUser` interface and `RepoUserInMemory class: RepoUser`.
+
+**Minimum requirements (what it must do):**
+
+1. `RepoUser` with functions: `save(user): Boolean`, `searchByEmail(email): User?`.
+
+2. `AuthService` that depends on `RepoUser` and `Logger`, and that:
+
+- Attempts to authenticate (fakes password or uses a simple property).
+
+- Returns `Result` (`Success/Error/Loading`).
+
+3. `App` that uses `Config` to decide whether to log operations, and that creates `AuthService` by passing it a `Logger` via DI.
+
+4. Tests/executions that show:
+
+- Successful logging.
+
+- Successful and failed authentication.
+
+- Logging according to `Config`.
+
+**Step-by-step (suggested):**
+
+- Design the interfaces and data classes.
+
+- Implement `RepoUserInMemory` with an internal `MutableMap`.
+
+- Implement `ConsoleLogger` and `NoOpLogger`.
+
+- Implement `AuthService(private val repo: RepoUser, logger: Logger) : Logger by logger` (or similar).
+
+- Create a `main` function or some tests that execute the cases.
+
+**Minimum test cases to cover:**
+
+- Registering a new user → `save` returns `true`.
+
+- Registering an existing user → `save` returns `false`.
+
+- Authenticate cwith correct credentials → `Success`.
+
+- Authenticate with incorrect credentials → `Error`.
+
+- Change `Config.DebugMode` and verify that the `Logger` is enabled/disabled as designed (if you apply that logic).
+
+**Extras (challenges):**
+
+- Add roles (using `sealed class Role` or `enum`) and control operation permissions.
+
+- Implement "mock" persistence by exporting/importing JSON (without external libraries, serialize manually if you want).
+
+- Implement unit tests for each component (repo, auth, logger).
+
+---
+
+# How to evaluate your work (quick checklist)
+
+- Code compiles without errors.
+
+- Each `data class` behaves as expected (test `copy`, `toString`).
+
+- `when` on `sealed` is exhaustive (no `else`).
+
+- Properties with validation use `field` and don't allow invalid states.
+
+- `Setter`/`getter` have the appropriate visibility.
+
+- `by` delegation works: the delegating class behaves like the implemented one.
+
+- `object` and `companion` work and are used as intended.
+
+- There are basic tests or executions that demonstrate core functionality.
+
+---
+
+# Workflow guide and best practices during activities
+
+- Write small tests or `main` that create instances and verify results (print + simple assertions).
+
+- Divide your code into files by responsibility (`models`, `services`, `repos`, `logging`).
+
+- Use clear names for `companion objects` if there is more than one factory method.
+
+- For debugging, implement a custom `toString()` if you need more detail.
+
+- Start with interfaces and `data class` before implementing service logic; This way you can easily mock/inject dependencies.
+
+---

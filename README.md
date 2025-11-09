@@ -14,3 +14,6 @@ To make it easier to understand and navigate through them, the below table sums 
 | RA4 |                   Generic functions, generic classes, generic interfaces, Erasure and reification of type params, type aliases                   |             [Generics in Kotlin](https://github.com/DavMunHer/LearningKotlin/tree/main/src/main/kotlin/RA4)             |
 | RA5 |                                                      Containers, functional API & Sequences                                                      |      [Container & Sequences in Kotlin](https://github.com/DavMunHer/LearningKotlin/tree/main/src/main/kotlin/RA5)       |
 | RA6 |                       Property delegation, DSL Pattern, builder functions, lambdas with receiver, the `invoke` convention                        |              [Builders & DSLs](https://github.com/DavMunHer/LearningKotlin/tree/main/src/main/kotlin/RA6)               |
+
+## Author
+> DavMunHer - [@LinkedIn](https://linkedin.com/in/DavMunHer) · [@GitHub](https://github.com/davmunher)
